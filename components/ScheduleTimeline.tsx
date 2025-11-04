@@ -4,6 +4,7 @@ import type { ScheduleItem } from '../types';
 interface ScheduleTimelineProps {
   schedule: ScheduleItem[];
   onToggleTask: (taskId: string) => void;
+  onSelectTask: (task: ScheduleItem) => void;
 }
 
 const timeToMinutes = (timeStr: string): number => {
@@ -63,7 +64,7 @@ const formatHour = (hour: number): string => {
 };
 
 
-export const ScheduleTimeline: React.FC<ScheduleTimelineProps> = ({ schedule, onToggleTask }) => {
+export const ScheduleTimeline: React.FC<ScheduleTimelineProps> = ({ schedule, onToggleTask, onSelectTask }) => {
     const tasksWithMinutes = useMemo(() => {
         return schedule
             .map((item) => {
@@ -144,18 +145,20 @@ export const ScheduleTimeline: React.FC<ScheduleTimelineProps> = ({ schedule, on
 
             return (
               <div
+                onClick={() => onSelectTask(item)}
                 key={item.id}
-                className={`absolute flex items-center p-2 rounded-lg border-l-4 text-white overflow-hidden shadow-lg transition-all duration-300 ${getPriorityClass(item.priority)} ${item.completed ? 'opacity-40' : 'opacity-95'}`}
+                className={`absolute flex items-center p-2 rounded-lg border-l-4 text-white overflow-hidden shadow-lg transition-all duration-300 cursor-pointer ${getPriorityClass(item.priority)} ${item.completed ? 'opacity-40' : 'opacity-95'}`}
                 style={{
                   left: `${left}%`,
                   width: `${Math.min(width, 100 - left)}%`,
                   top: `${top}px`,
                   height: `${height}px`,
                 }}
-                title={`${item.task} (${item.startTime} - ${item.endTime})`}
+                title={`Click to view details for: ${item.task} (${item.startTime} - ${item.endTime})`}
               >
                 <input
                     type="checkbox"
+                    onClick={(e) => e.stopPropagation()}
                     checked={item.completed}
                     onChange={() => onToggleTask(item.id)}
                     className="h-4 w-4 rounded bg-slate-900/50 border-slate-500 text-sky-400 focus:ring-sky-500 cursor-pointer flex-shrink-0"

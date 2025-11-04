@@ -16,6 +16,7 @@ import { ExpenseManager } from './components/ExpenseManager';
 import { SavePlanModal } from './components/SavePlanModal';
 import { EditPlanModal } from './components/EditPlanModal';
 import { TransactionModal } from './components/TransactionModal';
+import { TaskDetailModal } from './components/TaskDetailModal';
 
 // Fix: Refactored TabButton to use a named interface for props to resolve a type inference issue.
 interface TabButtonProps {
@@ -83,6 +84,7 @@ export default function App() {
   const [showEditModal, setShowEditModal] = useState<boolean>(false);
   const [planToEdit, setPlanToEdit] = useState<Plan | null>(null);
   const [optimizationSuggestions, setOptimizationSuggestions] = useState<string | null>(null);
+  const [selectedTask, setSelectedTask] = useState<ScheduleItem | null>(null);
   const [planSummary, setPlanSummary] = useState<string | null>(null);
   const [transactionModalState, setTransactionModalState] = useState<{isOpen: boolean, plan: Plan | null, type: 'expense' | 'credit'}>({isOpen: false, plan: null, type: 'expense'});
 
@@ -376,6 +378,10 @@ export default function App() {
     }
   };
 
+  const handleSelectTask = (task: ScheduleItem) => {
+    setSelectedTask(task);
+  };
+
 
   return (
     <div className="min-h-screen text-slate-800 dark:text-slate-200 font-sans">
@@ -443,6 +449,7 @@ export default function App() {
                     onDismissNotification={handleDismissNotification}
                     plans={savedPlans}
                     isPreviewing={previewPlanIds.size > 0}
+                    onSelectTask={handleSelectTask}
                     />
                 </div>
             )}
@@ -497,6 +504,14 @@ export default function App() {
             type={transactionModalState.type}
             onClose={handleCloseTransactionModal}
             onSave={handleSaveTransaction}
+        />
+      )}
+      {selectedTask && (
+        <TaskDetailModal
+            task={selectedTask}
+            planName={selectedTask.planId ? savedPlans.find(p => p.id === selectedTask.planId)?.name || null : 'Unsaved Plan'}
+            onClose={() => setSelectedTask(null)}
+            onToggleTask={handleToggleTask}
         />
       )}
     </div>

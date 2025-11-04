@@ -17,9 +17,10 @@ interface ScheduleDisplayProps {
   onDismissNotification: () => void;
   plans: Plan[];
   isPreviewing: boolean;
+  onSelectTask: (task: ScheduleItem) => void;
 }
 
-export const ScheduleDisplay: React.FC<ScheduleDisplayProps> = ({ schedule, isLoading, error, onToggleTask, upcomingTask, onDismissNotification, plans, isPreviewing }) => {
+export const ScheduleDisplay: React.FC<ScheduleDisplayProps> = ({ schedule, isLoading, error, onToggleTask, upcomingTask, onDismissNotification, plans, isPreviewing, onSelectTask }) => {
   const [viewMode, setViewMode] = useState<'list' | 'timeline'>('list');
   const [selectedDate, setSelectedDate] = useState<string | null>('all');
 
@@ -85,22 +86,28 @@ export const ScheduleDisplay: React.FC<ScheduleDisplayProps> = ({ schedule, isLo
     
     if (viewMode === 'timeline') {
         if (selectedDate === 'all') {
-            return <FullTimelineView schedule={schedule!} plans={plans} onToggleTask={onToggleTask}/>
+            return <FullTimelineView schedule={schedule!} plans={plans} onToggleTask={onToggleTask} onSelectTask={onSelectTask}/>
         }
-      return <ScheduleTimeline schedule={filteredSchedule} onToggleTask={onToggleTask} />;
+      return <ScheduleTimeline schedule={filteredSchedule} onToggleTask={onToggleTask} onSelectTask={onSelectTask} />;
     }
 
     // List View
     return (
       <div className="space-y-2 pr-2">
         {filteredSchedule.map((item) => (
-          <div key={item.id} className={`bg-white dark:bg-slate-700 p-2.5 rounded-lg shadow-md border-l-4 border-sky-500 transform hover:scale-[1.01] transition-all duration-200 ${item.completed ? 'opacity-50' : ''}`}>
+          <div 
+            key={item.id}
+            onClick={() => onSelectTask(item)}
+            className={`bg-white dark:bg-slate-700 p-2.5 rounded-lg shadow-md border-l-4 border-sky-500 transform hover:scale-[1.01] transition-all duration-200 cursor-pointer ${item.completed ? 'opacity-50' : ''}`}
+            title={`Click to view details for: ${item.task}`}
+          >
             <div className="flex justify-between items-start gap-3">
               <div className="flex items-start gap-3">
                 <input
                   type="checkbox"
                   checked={item.completed}
                   onChange={() => onToggleTask(item.id)}
+                  onClick={(e) => e.stopPropagation()}
                   className="mt-1 h-4 w-4 rounded bg-gray-200 dark:bg-slate-600 border-gray-300 dark:border-slate-500 text-sky-500 dark:text-sky-400 focus:ring-sky-600 dark:focus:ring-sky-500 cursor-pointer"
                   aria-label={`Mark ${item.task} as complete`}
                 />

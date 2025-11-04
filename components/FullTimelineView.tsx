@@ -5,6 +5,7 @@ interface FullTimelineViewProps {
   schedule: ScheduleItem[];
   plans: Plan[];
   onToggleTask: (taskId: string) => void;
+  onSelectTask: (task: ScheduleItem) => void;
 }
 
 const timeToMinutes = (timeStr: string): number => {
@@ -60,7 +61,7 @@ const formatHour = (hour: number): string => {
     return `${h - 12}pm`;
 };
 
-export const FullTimelineView: React.FC<FullTimelineViewProps> = ({ schedule, plans, onToggleTask }) => {
+export const FullTimelineView: React.FC<FullTimelineViewProps> = ({ schedule, plans, onToggleTask, onSelectTask }) => {
 
   const {
     sortedDates,
@@ -193,18 +194,20 @@ export const FullTimelineView: React.FC<FullTimelineViewProps> = ({ schedule, pl
 
                       return (
                         <div
+                          onClick={() => onSelectTask(item)}
                           key={item.id}
-                          className={`absolute flex items-center p-1.5 rounded text-white overflow-hidden shadow-md transition-all duration-300 ${planColor} ${item.completed ? 'opacity-40' : 'opacity-95'}`}
+                          className={`absolute flex items-center p-1.5 rounded text-white overflow-hidden shadow-md transition-all duration-300 cursor-pointer ${planColor} ${item.completed ? 'opacity-40' : 'opacity-95'}`}
                           style={{
                             left: `${left}%`,
                             width: `${Math.min(width, 100 - left)}%`,
                             top: `${top}px`,
                             height: `${height}px`,
                           }}
-                          title={`${planName}: ${item.task} (${item.startTime} - ${item.endTime})`}
+                          title={`Click to view details for: ${planName}: ${item.task} (${item.startTime} - ${item.endTime})`}
                         >
                            <input
                                 type="checkbox"
+                                onClick={(e) => e.stopPropagation()}
                                 checked={item.completed}
                                 onChange={() => onToggleTask(item.id)}
                                 className="h-4 w-4 rounded bg-slate-900/50 border-slate-500 text-sky-400 focus:ring-sky-500 cursor-pointer flex-shrink-0"
